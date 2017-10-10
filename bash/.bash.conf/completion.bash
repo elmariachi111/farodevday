@@ -90,5 +90,7 @@ _init_completion()
     return 0
 }
 
-source ~/.git-completion.bash
-source ~/.composer-bash-completion/composer
+source ~/.bash.conf/git-completion.bash
+source ~/.bash.conf/completion_symfony.bash
+source ~/.bash.conf/composer-bash-completion/composer
+
