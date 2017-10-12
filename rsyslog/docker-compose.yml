@@ -1,0 +1,66 @@
+version: '3'
+services:
+
+  logger:
+    image: sendgridlabs/loggly-docker
+    environment: 
+      - TAG=Docker
+      - TOKEN=631024a2-3bf2-4510-8f75-967a662dc955
+    ports:
+      - 514/udp
+    
+  redis:
+    image: redis
+    volumes:
+      - ./data/redis:/data
+      - ./logs:/var/log
+    expose: 
+      - 6379
+    command: redis-server --logfile /var/log/redis.log
+    links:
+      - logger
+    depends_on:
+      - logger
+
+  mysql:
+    build: ./mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=verysecret
+      - MYSQL_DATABASE=app
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    expose: 
+      - 3306
+    ports:
+      - 8083:3306
+    depends_on: 
+      - logger
+    links:
+      - logger
+    
+            
+  application:
+    build: .
+    image: node:8.3
+    working_dir: /app
+    command: npm --inspect=0.0.0.0:5858 start 
+    volumes:
+      - ./src:/app
+      - /app/node_modules
+      - ./logs/application:/var/log/application
+    ports:
+      - 8080:3000
+      - 5858:5858
+    links:
+      - redis
+      - mysql
+      - logger
+    depends_on:
+      - redis
+      - mysql
+      - logger
+    
+    environment:
+      - MYSQL_URL=mysql://root:verysecret@mysql/app
+      - REDIS_URL=redis://redis
