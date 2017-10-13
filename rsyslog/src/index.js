@@ -1,14 +1,24 @@
 const express = require('express')
-const morgan = require('morgan')
+const winston = require('winston')
+const winstonExpress = require('express-winston');
+const winstonSyslog = require('winston-syslog').Syslog;
 const mysql = require('mysql')
 const redis = require('redis')
-var bodyParser = require('body-parser')
+const bodyParser = require('body-parser')
 
 const app = express()
 const con = mysql.createConnection(process.env.MYSQL_URL);
 con.connect()
 
-app.use(morgan('combined'))
+app.use(winstonExpress.logger({
+  transports: [
+    new winston.transports.Syslog({
+      host: 'logger',
+      protocol: 'udp4',
+      port: 514
+    })
+  ]
+}));
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
