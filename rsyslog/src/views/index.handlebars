@@ -1,0 +1,15 @@
+<html>
+<body>
+    <h2>What happened so far?</h2>
+    <ul id="messages">
+        {{#each messages}}
+        <li><strong>{{utc created}} </strong> {{message}}</li>
+        {{/each}}
+    </ul>
+
+    <form action="/msg" method="POST">
+        <input type="text" name="message" placeholder="your message" />
+        <input type="submit" value="submit" />
+    </form>
+</body>
+</html>
