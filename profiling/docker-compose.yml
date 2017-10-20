@@ -11,8 +11,6 @@ services:
             MYSQL_PASSWORD: symfony
     php:
         build: ./php-fpm
-        ports:
-            - "11078:11078"
         volumes:
             - ./application:/var/www/application:cached
             - ./logs/symfony:/var/www/application/var/logs:cached
