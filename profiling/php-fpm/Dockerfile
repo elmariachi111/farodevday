@@ -1,6 +1,7 @@
 FROM alpine:3.6
 
-LABEL maintainer="Vincent Composieux <vincent.composieux@gmail.com>"
+ARG xdebug=0
+ARG profiling=0
 
 RUN apk add --update \
     php7-fpm \
@@ -19,7 +20,6 @@ RUN apk add --update \
     php7-pdo \
     php7-pdo_mysql \
     php7-mysqli \
-    php7-xdebug \
     php7-xml \
     php7-xmlwriter \
     php7-zlib \
@@ -31,13 +31,33 @@ RUN apk add --update \
     bash \
     git
 
+RUN if [ "$xdebug" -eq "1" ]; then \
+        apk add --update php7-xdebug \
+        && echo "zend_extension=xdebug.so" >> /etc/php7/conf.d/xdebug.ini \
+    ;fi
+
 RUN rm -rf /var/cache/apk/* && rm -rf /tmp/*
+
+RUN echo 'alias sf="php bin/console"' >> ~/.bashrc \
+    && echo 'alias ll="ls -la"' >> ~/.bashrc \
+    && echo 'alias ..="cd .."' >> ~/.bashrc
 
 RUN curl --insecure https://getcomposer.org/composer.phar -o /usr/bin/composer && chmod +x /usr/bin/composer
 
 ADD symfony.ini /etc/php7/php-fpm.d/
 ADD symfony.ini /etc/php7/conf.d/
 ADD symfony.pool.conf /etc/php7/php-fpm.d/
+ADD setupxdebug.sh /root/
+
+RUN if [ "$xdebug" -eq "1" ]; then \
+        bash /root/setupxdebug.sh \
+    ;fi
+
+RUN if [ "$profiling" -eq "1" ]; then \
+        echo "xdebug.profiler_enable=1" >> /etc/php7/conf.d/symfony.ini \
+        && echo "xdebug.profiler_enable_trigger=1" >> /etc/php7/conf.d/symfony.ini \
+        && echo "xdebug.profiler_output_dir=/var/www/application/var/logs" >> /etc/php7/conf.d/symfony.ini \
+    ;fi
 
 CMD ["php-fpm7", "-F"]
 
