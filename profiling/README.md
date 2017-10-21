@@ -49,7 +49,11 @@ Launch on Heroku and enable Blackfire.io
 ----------------------------------------
 
 - Create a new application on heroku, install heroku cli
-- Create a new git repo in application, commit inside that repo and push to your application (`cd application && git init && git add . && git commit -a`)
-- add environment variables as shown in .env.dist as heroku config vars (`heroku config:push` adds all .env entries at once)
-- add the heroku blackfire.io plugin and the blackfire chrome extension
+- Create a new git repo in `application` (`git init`), add your heroku app's remote to it (`heroku git:remote --app=yourappname`)
+- commit inside that repo and push to your application (`git add . && git commit -a`)
+- add environment variables as shown in .env.dist as heroku config vars (`heroku config:push` adds all .env entries at once). The vars must exist BEFORE you deploy the app! 
+- push to heroku master (`git push heroku master`)
+- add the heroku blackfire.io plugin (`heroku addons:create blackfire:test`)
+- redeploy (`git commit --allow-empty -m "redeploy with Blackfire enabled" && git push heroku master`) 
+- add the blackfire chrome extension and start live profiling.
 
