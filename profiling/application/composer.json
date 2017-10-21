@@ -14,6 +14,7 @@
         "symfony/lts": "^4@dev",
         "symfony/stopwatch": "^4.0@beta",
         "symfony/twig-bundle": "^4.0@beta",
+        "symfony/web-profiler-bundle": "^4.0@beta",
         "symfony/yaml": "^4.0"
     },
     "require-dev": {
